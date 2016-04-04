@@ -5,8 +5,9 @@ ccoritem.nocor nocor,
 ccoritem.kolang kolang,
 ccoritem.tglcor tglcor,
 k.koitem koitem,
+k.list_price list_price,
 ccoritem.qtydipesan qtydipesan_co,
-ccoritem.produk produk,
+item.brand produk,
 bbonitem.tglbon tglbon,
 ccoritem.hargabruto hargabruto_co,
 bbonitem.hargabruto hargabruto_faktur,
@@ -37,6 +38,7 @@ round(k.weeklyforecast,0) as weeklyforecast
 
 from 
 public.dim_weeklyforecast_umurstok_koli k
+left join dc_datlogi_item item on item.koitem = k.koitem 
 left join (select case when split_part(nalang, ' ', 1) = 'Yogyakarta' then 'Jogjakarta' when split_part(nalang, ' ', 1) = 'Tasik' then 'Tasikmalaya' when split_part(nalang, ' ', 1) = 'Makassar' then 'Makasar' else split_part(nalang, ' ', 1) end as nama_dc,* from dc_pelangga_area_a where dc='Tanggerang' and nalang like '%Distribution Centre') p 
 on p.nama_dc=k.dc
 left join
@@ -95,7 +97,7 @@ select
                                    b.koli,
                                    b.dailyforecast,
                                    b.weeklyforecast,
-                                   b.harsabruto_faktur,
+                                   b.list_price,
                                    b.qty_otw,
                                    b.qty_ndc,
                                    b.tanggal_ndc,
@@ -120,12 +122,12 @@ select
                                                        p.koli,
                                                        p.dailyforecast,
                                                        p.weeklyforecast,
-                                                       round(avg(p.hargabruto_faktur*1.1),2) harsabruto_faktur,
+                                                       p.list_price,
                                                        round(sum(p.qty_otw),2) qty_otw,
                                                        round(sum(p.qty_ndc),2) qty_ndc,
                                                        cast(current_date - interval '1 day' as date) as tanggal_ndc
                                                        from ppic_co_faktur_ndc p
-                                                       group by p.kolang,p.koitem,p.dc,p.produk,p.std_stock,p.koli,p.dailyforecast,p.weeklyforecast
+                                                       group by p.kolang,p.koitem,p.dc,p.produk,p.std_stock,p.koli,p.dailyforecast,p.weeklyforecast,p.list_price
                                                   ) a
                                                   left join stok_gudang_recent_month s 
                                                   on s.koitem=a.koitem and a.dc=s.kota and s.tanggal_early=a.tanggal_ndc
