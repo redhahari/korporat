@@ -86,7 +86,7 @@ select
                     ) z 
 
 
-
+#CO FAKTUR
 
 select
 ccoritem.nocor nocor,
